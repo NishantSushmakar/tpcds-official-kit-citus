@@ -1,0 +1,103 @@
+Time: 1183374.888 ms (19:43.375)
+Time: 30998.041 ms (00:30.998)
+Time: 511.955 ms
+Time: 02:15:07.551
+Time: 96135.176 ms (01:36.135)
+Time: 55083.924 ms (00:55.084)
+Time: 1022.360 ms (00:01.022)
+Time: 325.060 ms
+Time: 1960.986 ms (00:01.961)
+psql:/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcds-official-kit-citus/tpcdskit-official-mac/Queries/3GB/query_0_fixed.sql:613: ERROR:  complex joins are only supported when all distributed tables are co-located and joined on their distribution columns Time: 0.957 ms
+Time: 00:34:08.287
+Time: 150.100 ms
+Time: 324.645 ms
+Time: 48564.432 ms (00:48.564)
+Time: 48301.938 ms (00:48.302)
+Time: 278.352 ms
+psql:/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcds-official-kit-citus/tpcdskit-official-mac/Queries/3GB/query_0_fixed.sql:1041: ERROR:  complex joins are only supported when all distributed tables are co-located and joined on their distribution columns Time: 3.570 ms
+Time: 1089.091 ms (00:01.089)
+psql:/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcds-official-kit-citus/tpcdskit-official-mac/Queries/3GB/query_0_fixed.sql:1120: ERROR:  could not run distributed query with GROUPING SETS, CUBE, or ROLLUP HINT:  Consider using an equality filter on the distributed table's partition column. Time: 2.178 ms
+Time: 237.439 ms
+Time: 223.638 ms
+Time: 501.190 ms
+psql:/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcds-official-kit-citus/tpcdskit-official-mac/Queries/3GB/query_0_fixed.sql:1225: ERROR:  could not run distributed query with GROUPING SETS, CUBE, or ROLLUP HINT:  Consider using an equality filter on the distributed table's partition column. Time: 1.085 ms
+Time: 18392.349 ms (00:18.392)
+Time: 18538.669 ms (00:18.539)
+Time: 383.998 ms
+Time: 320.670 ms
+Time: 493.334 ms
+Time: 697.641 ms
+psql:/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcds-official-kit-citus/tpcdskit-official-mac/Queries/3GB/query_0_fixed.sql:1531: ERROR:  could not run distributed query with GROUPING HINT:  Consider using an equality filter on the distributed table's partition column. Time: 2.001 ms
+Time: 1156.586 ms (00:01.157)
+Time: 278.707 ms
+Time: 00:00:47.319
+Time: 7080.195 ms (00:07.080)
+psql:/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcds-official-kit-citus/tpcdskit-official-mac/Queries/3GB/query_0_fixed.sql:1742: ERROR:  complex joins are only supported when all distributed tables are co-located and joined on their distribution columnsTime: 1.254 ms
+Time: 557.795 ms
+Time: 264.391 ms
+psql:/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcds-official-kit-citus/tpcdskit-official-mac/Queries/3GB/query_0_fixed.sql:1906: ERROR:  complex joins are only supported when all distributed tables are co-located and joined on their distribution columnsTime: 0.909 ms
+psql:/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcds-official-kit-citus/tpcdskit-official-mac/Queries/3GB/query_0_fixed.sql:1938: ERROR:  could not run distributed query with GROUPING HINT:  Consider using an equality filter on the distributed table's partition column. Time: 0.435 ms
+psql:/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcds-official-kit-citus/tpcdskit-official-mac/Queries/3GB/query_0_fixed.sql:1955: ERROR:  the query contains a join that requires repartitioning HINT:  Set citus.enable_repartition_joins to on to enable repartitioning Time: 2.804 ms
+Time: 3681.441 ms (00:03.681)
+Time: 9166.071 ms (00:09.166)
+Time: 9138.696 ms (00:09.139)
+Time: 208.091 ms
+Time: 184.932 ms
+Time: 205.396 ms
+Time: 265.247 ms
+Time: 438.071 ms
+Time: 175.074 ms
+Time: 654.946 ms
+Time: 670366.444 ms (11:10.366)
+Time: 502.770 ms
+Time: 212.074 ms
+Time: 96.685 ms
+Time: 5279.181 ms (00:05.279)
+Time: 214.909 ms
+Time: 514.085 ms
+Time: 589.734 ms
+Time: 202.826 ms
+Time: 522.112 ms
+Time: 1974.118 ms (00:01.974)
+Time: 966.270 ms
+Time: 6362.704 ms (00:06.363)
+Time: 642.658 ms
+Time: 91.774 ms
+Time: 176.692 ms
+Time: 544.458 ms
+Time: 1527.930 ms (00:01.528)
+Time: 830.546 ms
+Time: 351.150 ms
+psql:/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcds-official-kit-citus/tpcdskit-official-mac/Queries/3GB/query_0_fixed.sql:3540: ERROR:  could not run distributed query with GROUPING SETS, CUBE, or ROLLUP HINT:  Consider using an equality filter on the distributed table's partition column. Time: 1.649 ms
+Time: 360.932 ms
+psql:/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcds-official-kit-citus/tpcdskit-official-mac/Queries/3GB/query_0_fixed.sql:3629: ERROR:  complex joins are only supported when all distributed tables are co-located and joined on their distribution columns Time: 0.657 ms
+psql:/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcds-official-kit-citus/tpcdskit-official-mac/Queries/3GB/query_0_fixed.sql:3669: ERROR:  could not run distributed query with GROUPING HINT:  Consider using an equality filter on the distributed table's partition column. Time: 1.829 ms
+Time: 419.580 ms
+Time: 677.649 ms
+Time: 228.238 ms
+Time: 720568.548 ms (12:00.569)
+Time: 7640.547 ms (00:07.641)
+Time: 1431.725 ms (00:01.432)
+Time: 723.366 ms
+Time: 1105.987 ms (00:01.106)
+Time: 452.342 ms
+Time: 682.128 ms
+Time: 363001.582 ms (06:03.002) 
+psql:/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcds-official-kit-citus/tpcdskit-official-mac/Queries/3GB/query_0_fixed.sql:4254: ERROR:  the query contains a join that requires repartitioning HINT:  Set citus.enable_repartition_joins to on to enable repartitioning Time: 3.991 ms
+Time: 333.599 ms
+Time: 241.135 ms
+Time: 250.171 ms
+psql:/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcds-official-kit-citus/tpcdskit-official-mac/Queries/3GB/query_0_fixed.sql:4454: ERROR:  could not run distributed query with GROUPING HINT:  Consider using an equality filter on the distributed table's partition column. Time: 0.469 ms
+Time: 4241.006 ms (00:04.241)
+Time: 1471.293 ms (00:01.471)
+Time: 619.211 ms
+Time: 143.804 ms
+Time: 76.122 ms
+psql:/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcds-official-kit-citus/tpcdskit-official-mac/Queries/3GB/query_0_fixed.sql:4682: ERROR:  complex joins are only supported when all distributed tables are co-located and joined on their distribution columns Time: 0.810 ms
+Time: 180.538 ms
+psql:/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcds-official-kit-citus/tpcdskit-official-mac/Queries/3GB/query_0_fixed.sql:4729: ERROR:  complex joins are only supported when all distributed tables are co-located and joined on their distribution columns Time: 1.786 ms
+psql:/Users/marwasulaiman/Documents/BDMA/DW/Project/tpcds-official-kit-citus/tpcdskit-official-mac/Queries/3GB/query_0_fixed.sql:4761: ERROR:  the query contains a join that requires repartitioning HINT:  Set citus.enable_repartition_joins to on to enable repartitioning Time: 2.112 ms
+Time: 174.495 ms
+Time: 389.675 ms
+Time: 222.643 ms
+Time: 307.798 ms
