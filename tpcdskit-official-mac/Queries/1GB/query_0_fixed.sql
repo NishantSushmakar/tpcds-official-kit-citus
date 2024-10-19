@@ -1938,7 +1938,9 @@ select
   limit 100;
 
 -- end query 36 in stream 0 using template query36.tpl
--- start query 37 in stream 0 using template query37.tpl -- fix: added interval to days
+-- start query 37 in stream 0 using template query37.tpl -- fix: added interval to days 
+SET LOCAL citus.enable_repartition_joins TO ON;
+SET LOCAL citus.multi_shard_modify_mode TO 'sequential';
 select  i_item_id
        ,i_item_desc
        ,i_current_price
@@ -4238,6 +4240,8 @@ with customer_total_return as
 
 -- end query 81 in stream 0 using template query81.tpl
 -- start query 82 in stream 0 using template query82.tpl -- fix: added interval to days
+SET LOCAL citus.enable_repartition_joins TO ON;
+SET LOCAL citus.multi_shard_modify_mode TO 'sequential';
 select  i_item_id
        ,i_item_desc
        ,i_current_price
@@ -4730,6 +4734,8 @@ limit 100;
 
 -- end query 94 in stream 0 using template query94.tpl
 -- start query 95 in stream 0 using template query95.tpl -- fix: added interval to days
+SET LOCAL citus.enable_repartition_joins TO ON;
+SET LOCAL citus.multi_shard_modify_mode TO 'sequential';
 with ws_wh as
 (select ws1.ws_order_number,ws1.ws_warehouse_sk wh1,ws2.ws_warehouse_sk wh2
  from web_sales ws1,web_sales ws2
