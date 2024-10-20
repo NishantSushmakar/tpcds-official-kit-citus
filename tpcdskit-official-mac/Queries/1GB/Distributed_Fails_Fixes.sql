@@ -139,4 +139,149 @@ ORDER BY cd_gender,
 		 cd_dep_college_count
 LIMIT 100;
 
+-- Query 35  Added with clause execution time : 00:03:26.372
+-- results verified 
+
+WITH store_sales_filtered AS(
+  SELECT ss_customer_sk
+  FROM store_sales ss
+  JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk
+  WHERE d_year = 1999 and d_qoy < 4
+),
+web_sales_filtered AS(
+  SELECT ws_bill_customer_sk
+  FROM web_sales ws
+  JOIN date_dim d ON ws.ws_sold_date_sk = d.d_date_sk
+  WHERE d_year = 1999 and d_qoy < 4
+),
+catalog_sales_filtered AS(
+	SELECT cs_ship_customer_sk
+	FROM catalog_sales cs
+	JOIN date_dim d ON cs.cs_sold_date_sk = d.d_date_sk
+	WHERE d_year = 1999 and d_qoy < 4
+)
+SELECT  
+  ca_state,
+  cd_gender,
+  cd_marital_status,
+  cd_dep_count,
+  COUNT(*) cnt1,
+  AVG(cd_dep_count),
+  STDDEV_SAMP(cd_dep_count),
+  SUM(cd_dep_count),
+  cd_dep_employed_count,
+  COUNT(*) cnt2,
+  AVG(cd_dep_employed_count),
+  STDDEV_SAMP(cd_dep_employed_count),
+  SUM(cd_dep_employed_count),
+  cd_dep_college_count,
+  COUNT(*) cnt3,
+  AVG(cd_dep_college_count),
+  STDDEV_SAMP(cd_dep_college_count),
+  SUM(cd_dep_college_count)
+FROM 
+  customer c,customer_address ca,customer_demographics
+WHERE
+  c.c_current_addr_sk = ca.ca_address_sk AND
+  cd_demo_sk = c.c_current_cdemo_sk AND
+  EXISTS(SELECT * FROM store_sales_filtered WHERE  c.c_customer_sk = ss_customer_sk) AND
+  (EXISTS(SELECT * FROM web_sales_filtered WHERE  c.c_customer_sk = ws_bill_customer_sk) OR 
+    EXISTS(SELECT * FROM catalog_sales_filtered WHERE c.c_customer_sk = cs_ship_customer_sk))
+GROUP BY ca_state,
+          cd_gender,
+          cd_marital_status,
+          cd_dep_count,
+          cd_dep_employed_count,
+          cd_dep_college_count
+ORDER BY ca_state,
+          cd_gender,
+          cd_marital_status,
+          cd_dep_count,
+          cd_dep_employed_count,
+          cd_dep_college_count
+LIMIT 100;
+
+-- Query 69 Added with clause execution time: 00:00:00.719
+-- results verified 
+
+WITH store_sales_filtered AS(
+  SELECT ss_customer_sk
+  FROM store_sales ss
+  JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk
+  WHERE d_year = 2002 AND d_moy BETWEEN 1 AND 1+2
+),
+web_sales_filtered AS(
+  SELECT ws_bill_customer_sk
+  FROM web_sales ws
+  JOIN date_dim d ON ws.ws_sold_date_sk = d.d_date_sk
+  WHERE d_year = 2002 AND d_moy BETWEEN 1 AND 1+2
+),
+catalog_sales_filtered AS(
+	SELECT cs_ship_customer_sk
+	FROM catalog_sales cs
+	JOIN date_dim d ON cs.cs_sold_date_sk = d.d_date_sk
+	WHERE d_year = 2002 AND d_moy BETWEEN 1 AND 1+2
+)
+SELECT  
+cd_gender,cd_marital_status,cd_education_status,
+COUNT(*) cnt1,cd_purchase_estimate,COUNT(*) cnt2,
+cd_credit_rating,COUNT(*) cnt3
+FROM
+customer c,customer_address ca,customer_demographics
+WHERE
+c.c_current_addr_sk = ca.ca_address_sk AND
+ca_state IN ('IL','TX','ME') AND
+cd_demo_sk = c.c_current_cdemo_sk 
+AND EXISTS (SELECT * FROM store_sales_filtered WHERE  c.c_customer_sk = ss_customer_sk) 
+AND(NOT EXISTS (SELECT * FROM web_sales_filtered WHERE  c.c_customer_sk = ws_bill_customer_sk) 
+AND NOT EXISTS (SELECT * FROM catalog_sales_filtered WHERE c.c_customer_sk = cs_ship_customer_sk))
+GROUP BY cd_gender,
+	  cd_marital_status,
+	  cd_education_status,
+	  cd_purchase_estimate,
+	  cd_credit_rating
+ORDER BY cd_gender,
+	  cd_marital_status,
+	  cd_education_status,
+	  cd_purchase_estimate,
+	  cd_credit_rating
+LIMIT 100;
+
+
+
+
+-- Query 92 - Just added the same kind of filters and table in subquery  Execution time - 00:00:00.121
+-- result verified 
+select  
+   sum(ws_ext_discount_amt)  as "Excess Discount Amount" 
+from 
+    web_sales 
+   ,item 
+   ,date_dim
+where
+i_manufact_id = 714
+and i_item_sk = ws_item_sk 
+and d_date between '2000-02-01' and 
+        (cast('2000-02-01' as date) + interval '90 days')
+and d_date_sk = ws_sold_date_sk 
+and ws_ext_discount_amt  
+     > ( 
+         SELECT 
+            1.3 * avg(ws_ext_discount_amt) 
+         FROM 
+            web_sales 
+           ,date_dim,item
+         WHERE 
+              i_manufact_id = 714
+          and i_item_sk = ws_item_sk 
+              ws_item_sk = i_item_sk 
+          and d_date between '2000-02-01' and
+                             (cast('2000-02-01' as date) + interval '90 days')
+          and d_date_sk = ws_sold_date_sk 
+      ) 
+order by sum(ws_ext_discount_amt)
+limit 100;
+
+
+
 
