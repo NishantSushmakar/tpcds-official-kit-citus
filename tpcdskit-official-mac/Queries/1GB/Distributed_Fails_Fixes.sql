@@ -247,6 +247,99 @@ ORDER BY cd_gender,
 	  cd_credit_rating
 LIMIT 100;
 
+-- Query 70 Rollup function substitued with union all and changes made accordingly Execution time : 00:00:00.510
+
+WITH temp_filter AS (
+	SELECT s_state
+    FROM  (SELECT s_state as s_state,
+ 		   RANK() OVER ( PARTITION BY s_state ORDER BY SUM(ss_net_profit) DESC) AS ranking
+           FROM store_sales, store, date_dim
+           WHERE d_month_seq BETWEEN 1220 AND 1220+11
+ 		   AND d_date_sk = ss_sold_date_sk
+ 		   AND s_store_sk  = ss_store_sk
+           GROUP BY s_state) tmp1 
+    WHERE ranking <= 5
+),
+sales_aggregation as (
+
+	SELECT sum(ss_net_profit) AS agg_sum,s_state,s_county
+	FROM store_sales,date_dim d1,store
+	WHERE
+    d1.d_month_seq BETWEEN 1220 AND 1220+11 AND d1.d_date_sk = ss_sold_date_sk
+    AND s_store_sk  = ss_store_sk AND s_state IN (SELECT s_state FROM temp_filter)
+	GROUP BY s_state,s_county
+),
+rollup_results as(
+
+	-- State + County
+	SELECT agg_sum AS total_sum ,s_state,s_county, 0 as lochierarchy,  
+	RANK() OVER (PARTITION BY s_state ORDER BY agg_sum DESC) as rank_within_parent
+	FROM sales_aggregation
+	UNION ALL 
+	-- State
+	SELECT SUM(agg_sum) AS total_sum , s_state , NULL AS s_county, 1 as lochierarchy ,
+	RANK() OVER (ORDER BY SUM(agg_sum) DESC) as rank_within_parent
+	FROM sales_aggregation
+	GROUP BY s_state
+	UNION ALL
+	-- Grand Total
+	SELECT SUM(agg_sum) AS total_sum , NULL AS s_state , NULL AS s_county, 2 AS lochierarchy,
+	1 as rank_within_parent
+	FROM sales_aggregation 
+)
+SELECT *
+FROM rollup_results
+ORDER BY lochierarchy desc,CASE WHEN lochierarchy = 0 THEN s_state END,rank_within_parent
+LIMIT 100;
+
+-- Query 86  Rollup function substitued with union all and changes made accordingly  execution time : 00:00:00.210
+
+WITH sales_aggregation AS (
+  SELECT 
+    SUM(ws_net_paid) AS category_class_sum,
+    i_category,
+    i_class
+    
+  FROM web_sales
+  JOIN date_dim d1 ON d1.d_date_sk = ws_sold_date_sk
+  JOIN item ON i_item_sk = ws_item_sk
+  WHERE d1.d_month_seq BETWEEN 1186 AND 1186+11
+  GROUP BY i_category, i_class
+),
+rollup_results AS (
+  -- Category + Class level
+  SELECT
+  	category_class_sum AS total_sum,
+    i_category,
+    i_class,
+    0 as lochierarchy,
+    RANK() OVER (PARTITION BY i_category ORDER BY category_class_sum DESC) as rank_within_parent
+  FROM sales_aggregation
+  
+  UNION ALL
+  
+  -- Category level
+  SELECT SUM(category_class_sum) as total_sum, i_category, NULL as i_class,1 as lochierarchy,
+    RANK() OVER (ORDER BY SUM(category_class_sum) DESC) as rank_within_parent
+  FROM sales_aggregation
+  GROUP BY i_category
+  
+  UNION ALL
+  
+  -- Grand total level
+  SELECT
+  	SUM(category_class_sum) as total_sum,
+    NULL as i_category,
+    NULL as i_class, 2 as lochierarchy, 1 as rank_within_parent
+  FROM sales_aggregation
+   )
+SELECT *
+FROM rollup_results
+ORDER BY 
+  lochierarchy DESC,
+  CASE WHEN lochierarchy = 0 THEN i_category END,
+  rank_within_parent
+LIMIT 100;
 
 
 
