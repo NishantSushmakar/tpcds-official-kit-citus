@@ -1,3 +1,207 @@
+-- Query 18 Used Union ALL inplace of roll up functions  execution time: 00:00:01.295
+SELECT i_item_id,
+       ca_country,
+       ca_state, 
+       ca_county,
+       avg(cast(cs_quantity as decimal(12,2))) agg1,
+       avg(cast(cs_list_price as decimal(12,2))) agg2,
+       avg(cast(cs_coupon_amt as decimal(12,2))) agg3,
+       avg(cast(cs_sales_price as decimal(12,2))) agg4,
+       avg(cast(cs_net_profit as decimal(12,2))) agg5,
+       avg(cast(c_birth_year as decimal(12,2))) agg6,
+       avg(cast(cd1.cd_dep_count as decimal(12,2))) agg7
+FROM catalog_sales
+INNER JOIN item ON (cs_item_sk = i_item_sk)
+INNER JOIN customer_demographics cd1 ON (cs_bill_cdemo_sk = cd1.cd_demo_sk)
+INNER JOIN customer ON (cs_bill_customer_sk = c_customer_sk)
+INNER JOIN customer_demographics cd2 ON (c_current_cdemo_sk = cd2.cd_demo_sk)
+INNER JOIN customer_address ON (c_current_addr_sk = ca_address_sk)
+INNER JOIN date_dim ON (cs_sold_date_sk = d_date_sk)
+WHERE cd1.cd_gender = 'F' 
+  AND cd1.cd_education_status = 'Primary'
+  AND c_birth_month in (1,3,7,11,10,4)
+  AND d_year = 2001
+  AND ca_state in ('AL','MO','TN','GA','MT','IN','CA')
+GROUP BY i_item_id, ca_country, ca_state, ca_county
+
+UNION ALL
+
+SELECT i_item_id,
+       ca_country,
+       ca_state, 
+       NULL as ca_county,
+       avg(cast(cs_quantity as decimal(12,2))) agg1,
+       avg(cast(cs_list_price as decimal(12,2))) agg2,
+       avg(cast(cs_coupon_amt as decimal(12,2))) agg3,
+       avg(cast(cs_sales_price as decimal(12,2))) agg4,
+       avg(cast(cs_net_profit as decimal(12,2))) agg5,
+       avg(cast(c_birth_year as decimal(12,2))) agg6,
+       avg(cast(cd1.cd_dep_count as decimal(12,2))) agg7
+FROM catalog_sales
+INNER JOIN item ON (cs_item_sk = i_item_sk)
+INNER JOIN customer_demographics cd1 ON (cs_bill_cdemo_sk = cd1.cd_demo_sk)
+INNER JOIN customer ON (cs_bill_customer_sk = c_customer_sk)
+INNER JOIN customer_demographics cd2 ON (c_current_cdemo_sk = cd2.cd_demo_sk)
+INNER JOIN customer_address ON (c_current_addr_sk = ca_address_sk)
+INNER JOIN date_dim ON (cs_sold_date_sk = d_date_sk)
+WHERE cd1.cd_gender = 'F' 
+  AND cd1.cd_education_status = 'Primary'
+  AND c_birth_month in (1,3,7,11,10,4)
+  AND d_year = 2001
+  AND ca_state in ('AL','MO','TN','GA','MT','IN','CA')
+GROUP BY i_item_id, ca_country, ca_state
+
+UNION ALL
+
+SELECT i_item_id,
+       ca_country,
+       NULL as ca_state, 
+       NULL as ca_county,
+       avg(cast(cs_quantity as decimal(12,2))) agg1,
+       avg(cast(cs_list_price as decimal(12,2))) agg2,
+       avg(cast(cs_coupon_amt as decimal(12,2))) agg3,
+       avg(cast(cs_sales_price as decimal(12,2))) agg4,
+       avg(cast(cs_net_profit as decimal(12,2))) agg5,
+       avg(cast(c_birth_year as decimal(12,2))) agg6,
+       avg(cast(cd1.cd_dep_count as decimal(12,2))) agg7
+FROM catalog_sales
+INNER JOIN item ON (cs_item_sk = i_item_sk)
+INNER JOIN customer_demographics cd1 ON (cs_bill_cdemo_sk = cd1.cd_demo_sk)
+INNER JOIN customer ON (cs_bill_customer_sk = c_customer_sk)
+INNER JOIN customer_demographics cd2 ON (c_current_cdemo_sk = cd2.cd_demo_sk)
+INNER JOIN customer_address ON (c_current_addr_sk = ca_address_sk)
+INNER JOIN date_dim ON (cs_sold_date_sk = d_date_sk)
+WHERE cd1.cd_gender = 'F' 
+  AND cd1.cd_education_status = 'Primary'
+  AND c_birth_month in (1,3,7,11,10,4)
+  AND d_year = 2001
+  AND ca_state in ('AL','MO','TN','GA','MT','IN','CA')
+GROUP BY i_item_id, ca_country
+
+UNION ALL
+
+SELECT i_item_id,
+       NULL as ca_country,
+       NULL as ca_state, 
+       NULL as ca_county,
+       avg(cast(cs_quantity as decimal(12,2))) agg1,
+       avg(cast(cs_list_price as decimal(12,2))) agg2,
+       avg(cast(cs_coupon_amt as decimal(12,2))) agg3,
+       avg(cast(cs_sales_price as decimal(12,2))) agg4,
+       avg(cast(cs_net_profit as decimal(12,2))) agg5,
+       avg(cast(c_birth_year as decimal(12,2))) agg6,
+       avg(cast(cd1.cd_dep_count as decimal(12,2))) agg7
+FROM catalog_sales
+INNER JOIN item ON (cs_item_sk = i_item_sk)
+INNER JOIN customer_demographics cd1 ON (cs_bill_cdemo_sk = cd1.cd_demo_sk)
+INNER JOIN customer ON (cs_bill_customer_sk = c_customer_sk)
+INNER JOIN customer_demographics cd2 ON (c_current_cdemo_sk = cd2.cd_demo_sk)
+INNER JOIN customer_address ON (c_current_addr_sk = ca_address_sk)
+INNER JOIN date_dim ON (cs_sold_date_sk = d_date_sk)
+WHERE cd1.cd_gender = 'F' 
+  AND cd1.cd_education_status = 'Primary'
+  AND c_birth_month in (1,3,7,11,10,4)
+  AND d_year = 2001
+  AND ca_state in ('AL','MO','TN','GA','MT','IN','CA')
+GROUP BY i_item_id
+
+UNION ALL
+
+SELECT NULL as i_item_id,
+       NULL as ca_country,
+       NULL as ca_state, 
+       NULL as ca_county,
+       avg(cast(cs_quantity as decimal(12,2))) agg1,
+       avg(cast(cs_list_price as decimal(12,2))) agg2,
+       avg(cast(cs_coupon_amt as decimal(12,2))) agg3,
+       avg(cast(cs_sales_price as decimal(12,2))) agg4,
+       avg(cast(cs_net_profit as decimal(12,2))) agg5,
+       avg(cast(c_birth_year as decimal(12,2))) agg6,
+       avg(cast(cd1.cd_dep_count as decimal(12,2))) agg7
+FROM catalog_sales
+INNER JOIN item ON (cs_item_sk = i_item_sk)
+INNER JOIN customer_demographics cd1 ON (cs_bill_cdemo_sk = cd1.cd_demo_sk)
+INNER JOIN customer ON (cs_bill_customer_sk = c_customer_sk)
+INNER JOIN customer_demographics cd2 ON (c_current_cdemo_sk = cd2.cd_demo_sk)
+INNER JOIN customer_address ON (c_current_addr_sk = ca_address_sk)
+INNER JOIN date_dim ON (cs_sold_date_sk = d_date_sk)
+WHERE cd1.cd_gender = 'F' 
+  AND cd1.cd_education_status = 'Primary'
+  AND c_birth_month in (1,3,7,11,10,4)
+  AND d_year = 2001
+  AND ca_state in ('AL','MO','TN','GA','MT','IN','CA')
+ORDER BY ca_country,
+         ca_state, 
+         ca_county,
+         i_item_id
+LIMIT 100;
+
+-- Query 22  Rollup Substituted with UNION ALL Execution time : 00:00:02.891 
+
+SELECT i_product_name
+      ,i_brand
+      ,i_class
+      ,i_category
+      ,avg(inv_quantity_on_hand) qoh
+FROM inventory
+INNER JOIN date_dim ON inv_date_sk=d_date_sk
+INNER JOIN item ON inv_item_sk=i_item_sk
+WHERE d_month_seq between 1200 and 1200 + 11
+GROUP BY i_product_name, i_brand, i_class, i_category
+
+UNION ALL
+
+SELECT i_product_name
+      ,i_brand
+      ,i_class
+      ,NULL as i_category
+      ,avg(inv_quantity_on_hand) qoh
+FROM inventory
+INNER JOIN date_dim ON (inv_date_sk=d_date_sk)
+INNER JOIN item ON (inv_item_sk=i_item_sk)
+WHERE d_month_seq between 1200 and 1200 + 11
+GROUP BY i_product_name, i_brand, i_class
+
+UNION ALL
+
+SELECT i_product_name
+      ,i_brand
+      ,NULL as i_class
+      ,NULL as i_category
+      ,avg(inv_quantity_on_hand) qoh
+FROM inventory
+INNER JOIN date_dim ON (inv_date_sk=d_date_sk)
+INNER JOIN item ON (inv_item_sk=i_item_sk)
+WHERE d_month_seq between 1200 and 1200 + 11
+GROUP BY i_product_name, i_brand
+
+UNION ALL
+
+SELECT i_product_name
+      ,NULL as i_brand
+      ,NULL as i_class
+      ,NULL as i_category
+      ,avg(inv_quantity_on_hand) qoh
+FROM inventory
+INNER JOIN date_dim ON (inv_date_sk=d_date_sk)
+INNER JOIN item ON (inv_item_sk=i_item_sk)
+WHERE d_month_seq between 1200 and 1200 + 11
+GROUP BY i_product_name
+
+UNION ALL
+
+SELECT NULL as i_product_name
+      ,NULL as i_brand
+      ,NULL as i_class
+      ,NULL as i_category
+      ,avg(inv_quantity_on_hand) qoh
+FROM inventory
+INNER JOIN date_dim ON (inv_date_sk=d_date_sk)
+INNER JOIN item ON (inv_item_sk=i_item_sk)
+WHERE d_month_seq between 1200 and 1200 + 11
+ORDER BY qoh, i_product_name, i_brand, i_class, i_category
+LIMIT 100;
+
 
 -- Query 32 -- Added with clause and compared with it later 00:00:00.810
 -- result verified from postgres
