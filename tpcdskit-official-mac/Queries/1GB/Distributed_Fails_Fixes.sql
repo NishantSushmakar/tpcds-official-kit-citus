@@ -73,8 +73,9 @@ order by count(distinct cs1.cs_order_number)
 limit 100;
 
 
--- Query 10 - replaced subquery joins with with caluses and IN check  00:00:02.412
--- result still not verified from postgres
+-- Query 10 - replaced subquery joins with with caluses and IN check  00:04:06.125
+-- result verified from postgres
+
 
 -- Filter store_sales for the relevant date range and county
 WITH store_sales_filtered AS (
@@ -113,18 +114,13 @@ SELECT
   COUNT(*) cnt5,
   cd_dep_college_count,
   COUNT(*) cnt6
-FROM customer c
-JOIN customer_address ca ON c.c_current_addr_sk = ca.ca_address_sk
-JOIN customer_demographics cd ON c.c_current_cdemo_sk = cd.cd_demo_sk
-WHERE ca.ca_county IN ('Fairfield County', 'Campbell County', 'Washtenaw County', 'Escambia County', 'Cleburne County')
-AND c.c_customer_sk IN (
-  -- Combine the results of the filtered distributed tables
-  SELECT ss_customer_sk FROM store_sales_filtered
-  UNION
-  SELECT ws_bill_customer_sk FROM web_sales_filtered
-  UNION
-  SELECT cs_ship_customer_sk FROM catalog_sales_filtered
-)
+FROM customer c,customer_address ca,customer_demographics 
+WHERE c.c_current_addr_sk = ca.ca_address_sk
+AND c.c_current_cdemo_sk = cd_demo_sk
+AND ca.ca_county IN ('Fairfield County', 'Campbell County', 'Washtenaw County', 'Escambia County', 'Cleburne County')
+AND EXISTS (SELECT * FROM store_sales_filtered Where ss_customer_sk=c.c_customer_sk )
+AND (EXISTS (SELECT * FROM web_sales_filtered Where ws_bill_customer_sk=c.c_customer_sk )
+OR EXISTS (SELECT * FROM catalog_sales_filtered Where cs_ship_customer_sk=c.c_customer_sk ))
 GROUP BY cd_gender, 
 	     cd_marital_status, 
 		 cd_education_status, 
