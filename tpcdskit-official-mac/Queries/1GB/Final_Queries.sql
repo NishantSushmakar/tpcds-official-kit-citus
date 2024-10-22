@@ -1317,24 +1317,70 @@ select  *
  limit 100;
 
 -- end query 21 in stream 0 using template query21.tpl
--- start query 22 in stream 0 using template query22.tpl
-select  i_product_name
-             ,i_brand
-             ,i_class
-             ,i_category
-             ,avg(inv_quantity_on_hand) qoh
-       from inventory
-           ,date_dim
-           ,item
-       where inv_date_sk=d_date_sk
-              and inv_item_sk=i_item_sk
-              and d_month_seq between 1200 and 1200 + 11
-       group by rollup(i_product_name
-                       ,i_brand
-                       ,i_class
-                       ,i_category)
-order by qoh, i_product_name, i_brand, i_class, i_category
-limit 100;
+-- start query 22 in stream 0 using template query22.tpl -- Dist Fix: Rollup Substituted with UNION ALL
+SELECT i_product_name
+      ,i_brand
+      ,i_class
+      ,i_category
+      ,avg(inv_quantity_on_hand) qoh
+FROM inventory
+INNER JOIN date_dim ON inv_date_sk=d_date_sk
+INNER JOIN item ON inv_item_sk=i_item_sk
+WHERE d_month_seq between 1200 and 1200 + 11
+GROUP BY i_product_name, i_brand, i_class, i_category
+
+UNION ALL
+
+SELECT i_product_name
+      ,i_brand
+      ,i_class
+      ,NULL as i_category
+      ,avg(inv_quantity_on_hand) qoh
+FROM inventory
+INNER JOIN date_dim ON (inv_date_sk=d_date_sk)
+INNER JOIN item ON (inv_item_sk=i_item_sk)
+WHERE d_month_seq between 1200 and 1200 + 11
+GROUP BY i_product_name, i_brand, i_class
+
+UNION ALL
+
+SELECT i_product_name
+      ,i_brand
+      ,NULL as i_class
+      ,NULL as i_category
+      ,avg(inv_quantity_on_hand) qoh
+FROM inventory
+INNER JOIN date_dim ON (inv_date_sk=d_date_sk)
+INNER JOIN item ON (inv_item_sk=i_item_sk)
+WHERE d_month_seq between 1200 and 1200 + 11
+GROUP BY i_product_name, i_brand
+
+UNION ALL
+
+SELECT i_product_name
+      ,NULL as i_brand
+      ,NULL as i_class
+      ,NULL as i_category
+      ,avg(inv_quantity_on_hand) qoh
+FROM inventory
+INNER JOIN date_dim ON (inv_date_sk=d_date_sk)
+INNER JOIN item ON (inv_item_sk=i_item_sk)
+WHERE d_month_seq between 1200 and 1200 + 11
+GROUP BY i_product_name
+
+UNION ALL
+
+SELECT NULL as i_product_name
+      ,NULL as i_brand
+      ,NULL as i_class
+      ,NULL as i_category
+      ,avg(inv_quantity_on_hand) qoh
+FROM inventory
+INNER JOIN date_dim ON (inv_date_sk=d_date_sk)
+INNER JOIN item ON (inv_item_sk=i_item_sk)
+WHERE d_month_seq between 1200 and 1200 + 11
+ORDER BY qoh, i_product_name, i_brand, i_class, i_category
+LIMIT 100;
 
 -- end query 22 in stream 0 using template query22.tpl
 -- start query 23 in stream 0 using template query23.tpl -- fix: added alias x, y, z, n
@@ -1834,32 +1880,37 @@ with ss as
  order by store_q2_q3_increase;
 
 -- end query 31 in stream 0 using template query31.tpl
--- start query 32 in stream 0 using template query32.tpl -- fix: added interval to days
+-- start query 32 in stream 0 using template query32.tpl -- fix: added interval to days -- Dist fix: cte
+With AvgDisc30 As
+(
+ select i_item_sk , 
+	1.3 * avg(cs_ext_discount_amt) as avg30
+ from 
+	catalog_sales 
+	,item 
+    ,date_dim
+ where 
+	  cs_item_sk = i_item_sk 
+  and d_date between '2001-03-09' and
+					 (cast('2001-03-09' as date) + interval '90 days')
+  and d_date_sk = cs_sold_date_sk 
+  Group by i_item_sk
+)
 select  sum(cs_ext_discount_amt)  as "excess discount amount" 
 from 
    catalog_sales 
-   ,item 
+   ,item i
    ,date_dim
 where
-i_manufact_id = 722
-and i_item_sk = cs_item_sk 
+i.i_manufact_id = 722
+and i.i_item_sk = cs_item_sk 
 and d_date between '2001-03-09' and 
         (cast('2001-03-09' as date) + interval '90 days')
 and d_date_sk = cs_sold_date_sk 
 and cs_ext_discount_amt  
-     > ( 
-         select 
-            1.3 * avg(cs_ext_discount_amt) 
-         from 
-            catalog_sales 
-           ,date_dim
-         where 
-              cs_item_sk = i_item_sk 
-          and d_date between '2001-03-09' and
-                             (cast('2001-03-09' as date) + interval '90 days')
-          and d_date_sk = cs_sold_date_sk 
-      ) 
+     > ( select avg30 from AvgDisc30 A where A.i_item_sk = i.i_item_sk ) 
 limit 100;
+
 
 -- end query 32 in stream 0 using template query32.tpl
 -- start query 33 in stream 0 using template query33.tpl
