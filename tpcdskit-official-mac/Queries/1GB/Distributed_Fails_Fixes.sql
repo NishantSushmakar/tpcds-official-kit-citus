@@ -580,5 +580,226 @@ order by sum(ws_ext_discount_amt)
 limit 100;
 
 
+ -- Query 27  Rollup function preserved, CTE used
+
+ WITH sales_data AS (
+    SELECT i_item_id, s_state,
+           ss_quantity,
+           ss_list_price,
+           ss_coupon_amt,
+           ss_sales_price
+    FROM store_sales, customer_demographics, date_dim, store, item
+    WHERE ss_sold_date_sk = d_date_sk
+      AND ss_item_sk = i_item_sk
+      AND ss_store_sk = s_store_sk
+      AND ss_cdemo_sk = cd_demo_sk
+      AND cd_gender = 'M'
+      AND cd_marital_status = 'W'
+      AND cd_education_status = 'Secondary'
+      AND d_year = 1999
+      AND s_state IN ('TN')
+)
+-- Local aggregation - rollup can be performed
+SELECT i_item_id,
+       s_state,
+       grouping(s_state) AS g_state,
+       avg(ss_quantity) AS agg1,
+       avg(ss_list_price) AS agg2,
+       avg(ss_coupon_amt) AS agg3,
+       avg(ss_sales_price) AS agg4
+FROM sales_data
+GROUP BY rollup(i_item_id, s_state)
+ORDER BY i_item_id, s_state
+LIMIT 100;
+
+
+-- Query 36  Rollup function substitued with union all and changes made accordingly
+
+WITH base_data AS (
+  SELECT 
+    ss_net_profit, 
+    ss_ext_sales_price,
+    i_category, 
+    i_class
+  FROM store_sales
+  JOIN date_dim d1 ON d1.d_date_sk = ss_sold_date_sk
+  JOIN item ON i_item_sk = ss_item_sk
+  JOIN store ON s_store_sk = ss_store_sk
+  WHERE d1.d_year = 2000
+    AND s_state IN ('TN', 'TN', 'TN', 'TN', 'TN', 'TN', 'TN', 'TN')
+),
+
+-- Category + Class level
+category_class_aggregation AS (
+  SELECT 
+    SUM(ss_net_profit) / SUM(ss_ext_sales_price) AS gross_margin,
+    i_category, 
+    i_class,
+    0 AS lochierarchy, 
+    RANK() OVER (PARTITION BY i_category 
+                 ORDER BY SUM(ss_net_profit) / SUM(ss_ext_sales_price) ASC) AS rank_within_parent,
+    i_category AS sort_category
+  FROM base_data
+  GROUP BY i_category, i_class
+),
+
+-- Category level
+category_aggregation AS (
+  SELECT 
+    SUM(ss_net_profit) / SUM(ss_ext_sales_price) AS gross_margin,
+    i_category,
+    NULL AS i_class,
+    1 AS lochierarchy,
+    RANK() OVER (ORDER BY SUM(ss_net_profit) / SUM(ss_ext_sales_price) ASC) AS rank_within_parent,
+    i_category AS sort_category
+  FROM base_data
+  GROUP BY i_category
+),
+
+-- Grand total level
+grand_total AS (
+  SELECT 
+    SUM(ss_net_profit) / SUM(ss_ext_sales_price) AS gross_margin,
+    NULL AS i_category,
+    NULL AS i_class,
+    2 AS lochierarchy, 
+    1 AS rank_within_parent,
+    NULL AS sort_category
+  FROM base_data
+),
+
+rollup_results AS (
+  SELECT i_category, i_class, lochierarchy, gross_margin, rank_within_parent, sort_category
+  FROM category_class_aggregation
+
+  UNION ALL
+
+  SELECT i_category, i_class, lochierarchy, gross_margin, rank_within_parent, sort_category
+  FROM category_aggregation
+
+  UNION ALL
+
+  SELECT i_category, i_class, lochierarchy, gross_margin, rank_within_parent, sort_category
+  FROM grand_total
+)
+
+SELECT * 
+FROM rollup_results
+ORDER BY 
+  lochierarchy DESC,
+  sort_category,
+  rank_within_parent
+LIMIT 100;
+
+
+-- Query 67  Rollup function substitued with union all and changes made accordingly
+
+WITH base_data AS (
+  SELECT 
+    i_category,
+    i_class,
+    i_brand,
+    i_product_name,
+    d_year,
+    d_qoy,
+    d_moy,
+    s_store_id,
+    SUM(COALESCE(ss_sales_price * ss_quantity, 0)) AS sumsales
+  FROM store_sales
+  INNER JOIN date_dim ON ss_sold_date_sk = d_date_sk
+  INNER JOIN store ON ss_store_sk = s_store_sk
+  INNER JOIN item ON ss_item_sk = i_item_sk
+  WHERE d_month_seq BETWEEN 1217 AND 1217 + 11
+  GROUP BY i_category, i_class, i_brand, i_product_name, d_year, d_qoy, d_moy, s_store_id
+),
+
+detailed_aggregation AS (
+  SELECT 
+    i_category,
+    i_class,
+    i_brand,
+    i_product_name,
+    d_year,
+    d_qoy,
+    d_moy,
+    s_store_id,
+    sumsales,
+    RANK() OVER (PARTITION BY i_category ORDER BY sumsales DESC) AS rk
+  FROM base_data
+),
+
+brand_aggregation AS (
+  SELECT 
+    i_category,
+    i_class,
+    i_brand,
+    NULL AS i_product_name,
+    d_year,
+    d_qoy,
+    d_moy,
+    s_store_id,
+    SUM(sumsales) AS sumsales,
+    RANK() OVER (PARTITION BY i_category ORDER BY SUM(sumsales) DESC) AS rk
+  FROM base_data
+  GROUP BY i_category, i_class, i_brand, d_year, d_qoy, d_moy, s_store_id
+),
+
+class_aggregation AS (
+  SELECT 
+    i_category,
+    i_class,
+    NULL AS i_brand,
+    NULL AS i_product_name,
+    d_year,
+    d_qoy,
+    d_moy,
+    s_store_id,
+    SUM(sumsales) AS sumsales,
+    RANK() OVER (PARTITION BY i_category ORDER BY SUM(sumsales) DESC) AS rk
+  FROM base_data
+  GROUP BY i_category, i_class, d_year, d_qoy, d_moy, s_store_id
+),
+
+category_aggregation AS (
+  SELECT 
+    i_category,
+    NULL AS i_class,
+    NULL AS i_brand,
+    NULL AS i_product_name,
+    d_year,
+    d_qoy,
+    d_moy,
+    s_store_id,
+    SUM(sumsales) AS sumsales,
+    RANK() OVER (PARTITION BY i_category ORDER BY SUM(sumsales) DESC) AS rk
+  FROM base_data
+  GROUP BY i_category, d_year, d_qoy, d_moy, s_store_id
+)
+
+SELECT *
+FROM detailed_aggregation
+WHERE rk <= 100
+
+UNION ALL
+
+SELECT *
+FROM brand_aggregation
+WHERE rk <= 100
+
+UNION ALL
+
+SELECT *
+FROM class_aggregation
+WHERE rk <= 100
+
+UNION ALL
+
+SELECT *
+FROM category_aggregation
+WHERE rk <= 100
+
+ORDER BY i_category, i_class, i_brand, i_product_name, d_year, d_qoy, d_moy, s_store_id, sumsales, rk
+LIMIT 100;
+
 
 
