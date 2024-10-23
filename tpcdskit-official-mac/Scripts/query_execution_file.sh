@@ -3,8 +3,8 @@
 # Database connection parameters
 DB_HOST="localhost"
 DB_PORT="9700"
-DB_NAME="Citus_M"
-DB_USER="nishantsushmakar"
+DB_NAME="Citus"
+DB_USER="marwasulaiman"
 DB_PASSWORD=""
 
 
@@ -28,7 +28,7 @@ mkdir -p "$output_dir"
 
 # Create CSV file with headers
 csv_file="${output_dir}/query_analysis.csv"
-echo "query_number,query,first_timestamp,last_timestamp,execution_time_microseconds,explain_output,error_message,status" > "$csv_file"
+echo "query_number,query,first_timestamp,last_timestamp,execution_time_microseconds,execution_time_formatted,explain_output,error_message,status" > "$csv_file"
 
 # Function to get timestamp in microseconds (macOS compatible)
 get_timestamp_micro() {
@@ -39,6 +39,18 @@ get_timestamp_micro() {
 format_timestamp() {
     local epoch_micro=$1
     perl -e 'use POSIX qw(strftime); printf("%s.%06d\n", strftime("%Y-%m-%d %H:%M:%S", localtime($ARGV[0]/1000000)), $ARGV[0]%1000000)' "$epoch_micro"
+}
+
+
+# Function to format execution time in hr:min:sec
+format_execution_time() {
+    local microseconds=$1
+    local total_seconds=$((microseconds / 1000000))
+    local remaining_microseconds=$((microseconds % 1000000))
+    local hours=$((total_seconds / 3600))
+    local minutes=$(( (total_seconds % 3600) / 60 ))
+    local seconds=$((total_seconds % 60))
+    printf "%02d:%02d:%02d.%06d\n" $hours $minutes $seconds $remaining_microseconds
 }
 
 # Function to execute query and get execution time
@@ -67,6 +79,9 @@ execute_query() {
     # Calculate execution time in microseconds
     local execution_time=$((last_micro - first_micro))
 
+    # Formatted
+    local execution_time_formatted=$(format_execution_time $execution_time)
+
     # Check if query failed
     if [ $query_exit_code -ne 0 ]; then
         status="ERROR"
@@ -80,13 +95,15 @@ execute_query() {
     error_message=$(echo "$error_message" | sed 's/"/""/g')
 
     # Write to CSV file
-    echo "\"$query_num\",\"$query\",\"$first_timestamp\",\"$last_timestamp\",\"$execution_time\",\"$explain_output\",\"$error_message\",\"$status\"" >> "$csv_file"
+    echo "\"$query_num\",\"$query\",\"$first_timestamp\",\"$last_timestamp\",\"$execution_time\",\"$execution_time_formatted\",\"$explain_output\",\"$error_message\",\"$status\"" >> "$csv_file"
 
     # Print status to console
     echo "Status: $status"
     if [ ! -z "$error_message" ]; then
         echo "Error: $error_message"
     fi
+
+    echo "Query runtime: $execution_time_formatted"
 
     return $query_exit_code
 }
