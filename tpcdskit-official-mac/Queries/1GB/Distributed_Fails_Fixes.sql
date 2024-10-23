@@ -691,6 +691,85 @@ ORDER BY
 LIMIT 100;
 
 
+-- Query 67 Fix was to substitute Roll Up with Union Execution time:  00:00:06.144
 
+with store_sales_agg AS (
+	SELECT i_category,i_class,i_brand,i_product_name,d_year,
+	       d_qoy,d_moy,s_store_id,SUM(COALESCE(ss_sales_price*ss_quantity,0)) sumsales
+	FROM store_sales,date_dim,store,item
+	WHERE  ss_sold_date_sk=d_date_sk
+	AND ss_item_sk=i_item_sk
+	AND ss_store_sk = s_store_sk
+	AND d_month_seq BETWEEN 1217 AND 1217+11
+	GROUP BY i_category, i_class, i_brand, i_product_name, d_year, d_qoy, d_moy,s_store_id),
+
+roll_up_results AS (
+
+	SELECT * 
+	FROM store_sales_agg
+	UNION ALL
+	SELECT i_category,i_class,i_brand,i_product_name,d_year,
+	       d_qoy,d_moy,NULL AS s_store_id,SUM(sumsales) AS sumsales
+    FROM store_sales_agg
+	GROUP BY i_category, i_class, i_brand, i_product_name, d_year, d_qoy, d_moy
+	UNION ALL
+	SELECT i_category,i_class,i_brand,i_product_name,d_year,
+	       d_qoy,NULL AS d_moy,NULL AS s_store_id,SUM(sumsales) AS sumsales
+    FROM store_sales_agg
+	GROUP BY i_category, i_class, i_brand, i_product_name, d_year, d_qoy
+	UNION ALL
+	SELECT i_category,i_class,i_brand,i_product_name,d_year,
+	       NULL AS d_qoy,NULL AS d_moy,NULL AS s_store_id,SUM(sumsales) AS sumsales
+	FROM store_sales_agg
+	GROUP BY i_category, i_class, i_brand, i_product_name, d_year
+	UNION ALL
+	SELECT i_category,i_class,i_brand,i_product_name,NULL AS d_year,
+	       NULL AS d_qoy,NULL AS d_moy,NULL AS s_store_id,SUM(sumsales) AS sumsales
+	FROM store_sales_agg
+	GROUP BY i_category, i_class, i_brand, i_product_name
+	UNION ALL
+	SELECT i_category,i_class,i_brand,NULL AS i_product_name,NULL AS d_year,
+	       NULL AS d_qoy,NULL AS d_moy,NULL AS s_store_id,SUM(sumsales) AS sumsales
+	FROM store_sales_agg
+	GROUP BY i_category, i_class, i_brand
+	UNION ALL
+	SELECT i_category,i_class,NULL AS i_brand,NULL AS i_product_name,NULL AS d_year,
+	       NULL AS d_qoy,NULL AS d_moy,NULL AS s_store_id,SUM(sumsales) AS sumsales
+	FROM store_sales_agg
+	GROUP BY i_category, i_class
+	UNION ALL
+	SELECT i_category,NULL AS i_class,NULL AS i_brand,NULL AS i_product_name,NULL AS d_year,
+	       NULL AS d_qoy,NULL AS d_moy,NULL AS s_store_id,SUM(sumsales) AS sumsales
+	FROM store_sales_agg
+	GROUP BY i_category
+	UNION ALL
+	SELECT NULL AS i_category,NULL AS i_class,NULL AS i_brand,NULL AS i_product_name,NULL AS d_year,
+	       NULL AS d_qoy,NULL AS d_moy,NULL AS s_store_id,SUM(sumsales) AS sumsales
+	FROM store_sales_agg
+),
+
+rank_results AS(
+
+SELECT i_category,i_class,i_brand,i_product_name,d_year,d_qoy,
+       d_moy,s_store_id,sumsales,RANK() OVER(PARTITION BY i_category ORDER BY sumsales DESC) rk
+
+FROM roll_up_results
+
+
+)
+SELECT *
+FROM rank_results
+WHERE rk <= 100
+ORDER BY i_category
+        ,i_class
+        ,i_brand
+        ,i_product_name
+        ,d_year
+        ,d_qoy
+        ,d_moy
+        ,s_store_id
+        ,sumsales
+        ,rk
+LIMIT 100;
 
 

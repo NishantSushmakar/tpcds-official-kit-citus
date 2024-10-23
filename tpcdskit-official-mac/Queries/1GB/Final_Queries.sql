@@ -3712,35 +3712,71 @@ select
 
 -- end query 66 in stream 0 using template query66.tpl
 -- start query 67 in stream 0 using template query67.tpl
-select  *
-from (select i_category
-            ,i_class
-            ,i_brand
-            ,i_product_name
-            ,d_year
-            ,d_qoy
-            ,d_moy
-            ,s_store_id
-            ,sumsales
-            ,rank() over (partition by i_category order by sumsales desc) rk
-      from (select i_category
-                  ,i_class
-                  ,i_brand
-                  ,i_product_name
-                  ,d_year
-                  ,d_qoy
-                  ,d_moy
-                  ,s_store_id
-                  ,sum(coalesce(ss_sales_price*ss_quantity,0)) sumsales
-            from store_sales
-                ,date_dim
-                ,store
-                ,item
-       where  ss_sold_date_sk=d_date_sk
-          and ss_item_sk=i_item_sk
-          and ss_store_sk = s_store_sk
-          and d_month_seq between 1217 and 1217+11
-       group by  rollup(i_category, i_class, i_brand, i_product_name, d_year, d_qoy, d_moy,s_store_id))dw1) dw2
+with store_sales_agg as (
+	select i_category,i_class,i_brand,i_product_name,d_year,
+	       d_qoy,d_moy,s_store_id,sum(coalesce(ss_sales_price*ss_quantity,0)) sumsales
+	from store_sales,date_dim,store,item
+	where  ss_sold_date_sk=d_date_sk
+	and ss_item_sk=i_item_sk
+	and ss_store_sk = s_store_sk
+	and d_month_seq between 1217 and 1217+11
+	group by i_category, i_class, i_brand, i_product_name, d_year, d_qoy, d_moy,s_store_id),
+
+roll_up_results as (
+
+	select * 
+	from store_sales_agg
+	union all
+	select i_category,i_class,i_brand,i_product_name,d_year,
+	       d_qoy,d_moy,null as s_store_id,sum(sumsales) as sumsales
+    from store_sales_agg
+	group by i_category, i_class, i_brand, i_product_name, d_year, d_qoy, d_moy
+	union all
+	select i_category,i_class,i_brand,i_product_name,d_year,
+	       d_qoy,null as asd_moy,null as s_store_id,sum(sumsales) as sumsales
+    from store_sales_agg
+	group by i_category, i_class, i_brand, i_product_name, d_year, d_qoy
+	union all
+	select i_category,i_class,i_brand,i_product_name,d_year,
+	       null as d_qoy,null as d_moy,null as s_store_id,sum(sumsales) as sumsales
+	from store_sales_agg
+	group by i_category, i_class, i_brand, i_product_name, d_year
+	union all
+	select i_category,i_class,i_brand,i_product_name,null as d_year,
+	       null as d_qoy,null as d_moy,null as s_store_id,sum(sumsales) as sumsales
+	from store_sales_agg
+	group by i_category, i_class, i_brand, i_product_name
+	union select i_category,i_class,i_brand,null as i_product_name,null as d_year,
+	       null as d_qoy,null asd_moy,null as s_store_id,sum(sumsales) Aassumsales
+	from store_sales_agg
+	group by i_category, i_class, i_brand
+	union all
+	select i_category,i_class,null as i_brand,null as i_product_name,null as d_year,
+	       null as d_qoy,null as d_moy,null as s_store_id,sum(sumsales) Aassumsales
+	from store_sales_agg
+	group by i_category, i_class
+	union all
+	select i_category,null as i_class,null as i_brand,null as i_product_name,null as d_year,
+	       null as d_qoy,null as d_moy,null as s_store_id,sum(sumsales) as sumsales
+	from store_sales_agg	
+	group by i_category
+	union all
+	select null as i_category,null as i_class,null as i_brand,null as i_product_name,null as d_year,
+	       null as d_qoy,null as d_moy,null as s_store_id,sum(sumsales) as sumsales
+	from store_sales_agg
+),
+
+rank_results as(
+
+select i_category,i_class,i_brand,i_product_name,d_year,d_qoy,
+       d_moy,s_store_id,sumsales,rank() over(partition by i_category order by sumsales desc) rk
+
+from roll_up_results
+
+
+)
+select *
+from rank_results
 where rk <= 100
 order by i_category
         ,i_class
@@ -3753,7 +3789,6 @@ order by i_category
         ,sumsales
         ,rk
 limit 100;
-
 -- end query 67 in stream 0 using template query67.tpl
 -- start query 68 in stream 0 using template query68.tpl
 select  c_last_name
