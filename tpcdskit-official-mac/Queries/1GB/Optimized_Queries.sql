@@ -22,6 +22,7 @@ and s_store_sk = ctr1.ctr_store_sk
 and s_state = 'TN'
 and ctr1.ctr_customer_sk = c_customer_sk
 order by c_customer_id
+limit 100;
 -- end query 1 in stream 0 using template query1.tpl
 -- start query 4 in stream 0 using template query4.tpl
 with year_total_s as (
