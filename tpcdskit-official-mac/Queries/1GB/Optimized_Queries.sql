@@ -333,3 +333,38 @@ order by
     cd_dep_college_count
 limit 100;
 -- end query 35 in stream 0 using template query35.tpl
+-- start query 95 in stream 0 using template query95.tpl
+set local citus.enable_repartition_joins to 'on';
+set local citus.multi_shard_modify_mode to 'sequential';
+
+with ws_wh as (
+    select ws_order_number
+    from web_sales
+    group by ws_order_number
+    having count(distinct ws_warehouse_sk) > 1
+)
+select
+    count(distinct ws1.ws_order_number) as "order count",
+    sum(ws1.ws_ext_ship_cost) as "total shipping cost",
+    sum(ws1.ws_net_profit) as "total net profit"
+from
+    web_sales ws1
+    join date_dim on ws1.ws_ship_date_sk = date_dim.d_date_sk
+    join customer_address on ws1.ws_ship_addr_sk = customer_address.ca_address_sk
+    join web_site on ws1.ws_web_site_sk = web_site.web_site_sk
+where
+    date_dim.d_date BETWEEN '2001-04-01' AND (cast('2001-4-01' as date) + interval '60 days')
+    and customer_address.ca_state = 'VA'
+    and web_site.web_company_name = 'pri'
+	and exists (
+        select ws_order_number
+        from ws_wh
+        where ws_wh.ws_order_number = ws1.ws_order_number
+    )
+    and exists (
+        select wr_order_number
+        from web_returns wr
+        join ws_wh on wr.wr_order_number = ws_wh.ws_order_number
+        where wr.wr_order_number = ws1.ws_order_number
+    );
+-- start query 95 in stream 0 using template query95.tpl
