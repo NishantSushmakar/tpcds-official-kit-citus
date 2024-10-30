@@ -269,3 +269,67 @@ year_total_w as (
 limit 100;
 
 -- end query 74 in stream 0 using template query74.tpl
+
+-- start query 35 in stream 0 using template query35.tpl
+with store_sales_tmp as (
+    select ss_customer_sk
+    from store_sales ss
+    join date_dim d on ss.ss_sold_date_sk = d.d_date_sk
+    where d_year = 1999 and d_qoy < 4
+    group by ss_customer_sk
+),
+web_catalog_sales_tmp as (
+    select c_customer_sk
+    from (
+        select ws_bill_customer_sk as c_customer_sk
+        from web_sales ws
+        join date_dim d on ws.ws_sold_date_sk = d.d_date_sk
+        where d_year = 1999 and d_qoy < 4
+        union
+        select cs_ship_customer_sk as c_customer_sk
+        from catalog_sales cs
+        join date_dim d on cs.cs_sold_date_sk = d.d_date_sk
+        where d_year = 1999 and d_qoy < 4
+    ) sub
+)
+select
+    ca_state,
+    cd_gender,
+    cd_marital_status,
+    cd_dep_count,
+    count(*) cnt1,
+    avg(cd_dep_count),
+    stddev_samp(cd_dep_count),
+    sum(cd_dep_count),
+    cd_dep_employed_count,
+    count(*) cnt2,
+    avg(cd_dep_employed_count),
+    stddev_samp(cd_dep_employed_count),
+    sum(cd_dep_employed_count),
+    cd_dep_college_count,
+    count(*) cnt3,
+    avg(cd_dep_college_count),
+    stddev_samp(cd_dep_college_count),
+    sum(cd_dep_college_count)
+from
+    customer c
+    join customer_address ca on c.c_current_addr_sk = ca.ca_address_sk
+    join customer_demographics cd on cd.cd_demo_sk = c.c_current_cdemo_sk
+    join store_sales_tmp ss_tmp on c.c_customer_sk = ss_tmp.ss_customer_sk
+    join web_catalog_sales_tmp wcs_tmp on c.c_customer_sk = wcs_tmp.c_customer_sk
+group by
+    ca_state,
+    cd_gender,
+    cd_marital_status,
+    cd_dep_count,
+    cd_dep_employed_count,
+    cd_dep_college_count
+order by
+    ca_state,
+    cd_gender,
+    cd_marital_status,
+    cd_dep_count,
+    cd_dep_employed_count,
+    cd_dep_college_count
+limit 100;
+-- end query 35 in stream 0 using template query35.tpl
