@@ -367,4 +367,4 @@ where
         join ws_wh on wr.wr_order_number = ws_wh.ws_order_number
         where wr.wr_order_number = ws1.ws_order_number
     );
--- start query 95 in stream 0 using template query95.tpl
+-- end query 95 in stream 0 using template query95.tpl
