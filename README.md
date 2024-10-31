@@ -19,6 +19,29 @@ The project aims to implement the TPC-DS benchmark on Citus Database (a Postgres
   - you can use your preferred destination directory (option -dir), and make sure it exists before executing the command.
   - here we are generating 1GB data, same command will be used to generate bigger scales.
 
-4. Create the tables according to TPC-Ds schema, set the distribution and reference tables, and load the data, using the script schema_and_load.sh in [this directory](/tpcds-official-kit-citus/tpcdskit-official-mac/Scripts)
+4. Create the tables according to TPC-Ds schema, set the distribution and reference tables, and load the data, by running the script schema_and_load.sh located [here](tpcdskit-official-mac/Scripts).
+
+notes:
+- make sure the paths in SQL_FILES and DATA_DIR mentioned in the script correspond to the paths of the files on your machine.
+- make sure the DB_NAME and MASTER_PORT are similar to the ones used in the Citus setup in point 2.
+- a file 'execution_times.txt' will be produced after the script runs. It contains the time taken for each step and for loading every table.
+
+5. Run the queries against your DB by running the script query_execution_file.sh located [here](tpcdskit-official-mac/Scripts)., and with passing path of this [sql file](tpcdskit-official-mac/Queries/1GB/Final_Queries.sql) containing the queries as an argument.
+
+Example: In terminal in Scripts directory:
+./query_execution_file.sh ../Queries/1GB/Final_Queries.sql
+
+notes:
+- make sure the DB info in the script are similar to the ones used in the Citus setup in point 2.
+- a file 'query_analysis.csv' will be produced after the script runs. It contains the status and runtime of every query.
+
+
+
+- Steps 3 to 5 can be repeated for different scales.
+
+   
+
+
+   
 
 
