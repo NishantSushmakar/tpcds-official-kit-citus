@@ -32,7 +32,7 @@ In order to replicate our steps, the following should be done:
 	- make sure the DB_NAME and MASTER_PORT are similar to the ones used in the Citus setup in point 2.
 	- a file 'execution_times.txt' will be produced after the script runs. It contains the time taken for each step and for loading every table.
 
-5. Run the queries against your DB by running the script query_execution_file.sh located [here](tpcdskit-official-mac/Scripts)., and with passing path of this [sql file](tpcdskit-official-mac/Queries/1GB/Final_Queries.sql) containing the queries as an argument.
+5. Run the queries against your DB by running the script query_execution_file.sh located [here](tpcdskit-official-mac/Scripts)., and with passing path of this [sql file](tpcdskit-official-mac/Queries/1GB/query_0_step_3_after_optimisation.sql) containing the queries as an argument.
 
 		Example: In terminal in Scripts directory:
 		./query_execution_file.sh ../Queries/1GB/Final_Queries.sql
