@@ -9,7 +9,7 @@ The project aims to perform the [TPC-DS benchmark](https://www.tpc.org/tpcds/def
 In order to replicate our steps, the following should be done:
 
 
-1. Clone this repository, cd to the tools directory in terminal, and execute this command:
+1. Clone this repository, cd to the [tools](tpcdskit-official-mac/tools) directory in terminal, and execute this command:
 
 	 	 make OS=MACOS
 
