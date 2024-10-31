@@ -21,7 +21,7 @@ In order to replicate our steps, the following should be done:
   
 		  notes: 
 		  - you can use your preferred destination directory (option -dir), and make sure it exists before executing the command.
-		  - here we are generating 1GB data, same command will be used to generate bigger scales.
+		  - here we are generating 1GB data, same command will be used to generate bigger scales with only changing the scale option.
 
 4. Create the tables according to TPC-Ds schema, set the distribution and reference tables, and load the data, by running the script schema_and_load.sh located [here](tpcdskit-official-mac/Scripts).
 
