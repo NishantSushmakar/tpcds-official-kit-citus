@@ -25,6 +25,7 @@ order by c_customer_id
 limit 100;
 -- end query 1 in stream 0 using template query1.tpl
 -- start query 4 in stream 0 using template query4.tpl
+set local citus.max_intermediate_result_size = '5GB';
 with year_total_s as (
  select c_customer_id customer_id
        ,c_first_name customer_first_name
@@ -136,6 +137,7 @@ limit 100;
 
 -- end query 4 in stream 0 using template query4.tpl
 -- start query 11 in stream 0 using template query11.tpl
+set local citus.max_intermediate_result_size = '5GB';
 with year_total_s as (
  select c_customer_id customer_id
        ,c_first_name customer_first_name
