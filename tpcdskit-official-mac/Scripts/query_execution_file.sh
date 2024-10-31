@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # Database connection parameters
-DB_HOST="localhost"
-DB_PORT="9700"
-DB_NAME="Citus"
-DB_USER="marwasulaiman"
-DB_PASSWORD=""
+DB_HOST=$DB_HOST
+DB_PORT=$DB_PORT
+DB_NAME=$DB_NAME
+DB_USER=$DB_USERNAME
+DB_PASSWORD=$DB_PASSWORD
 
 
 # Check if input file is provided
