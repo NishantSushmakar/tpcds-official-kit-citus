@@ -15,7 +15,7 @@ In order to replicate our steps, the following should be done:
 
 2. Install Citus locally on the machine by following section 3.6 Citus Cluster Setup in the report. 
 
-3. Generate the Data, using this command in terminal (in tools directory too):
+3. Generate the Data, using this command in terminal (Ensure that your present working directory is tools):
   
   		./dsdgen -scale 1 -dir ../Data/1GB -verbose y -terminate n
   
