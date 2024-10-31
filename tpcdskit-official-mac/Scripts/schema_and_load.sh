@@ -4,18 +4,18 @@
 OUTPUT_FILE="execution_times.txt"
 
 # Database connection parameters
-MASTER_PORT=$DB_PORT
-DB_NAME=$DB_NAME
+MASTER_PORT=""
+DB_NAME=""
 
 # SQL file paths
 SQL_FILES=(
-    "/Users/nishantsushmakar/Documents/projects_ulb/tpcds-official-kit-citus/tpcdskit-official-mac/tools/tpcds.sql"
-    "/Users/nishantsushmakar/Documents/projects_ulb/tpcds-official-kit-citus/tpcdskit-official-mac/tools/tpcds_ri.sql"
-    "/Users/nishantsushmakar/Documents/projects_ulb/tpcds-official-kit-citus/tpcdskit-official-mac/Queries/dist_ref_tables.sql"
+    "../tools/tpcds.sql"
+    "../tools/tpcds_ri.sql"
+    "../Queries/dist_ref_tables.sql"
 )
 
 # Data directory
-DATA_DIR="/Users/nishantsushmakar/Documents/projects_ulb/tpcds-official-kit-citus/data-1-gb"
+DATA_DIR="../../tpcds-official-kit-citus/data-1-gb"
 
 # Tables array
 tables=( "date_dim" "customer_address" "customer_demographics" "income_band" "household_demographics" 

@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # Database connection parameters
-DB_HOST=$DB_HOST
-DB_PORT=$DB_PORT
-DB_NAME=$DB_NAME
-DB_USER=$DB_USERNAME
-DB_PASSWORD=$DB_PASSWORD
+DB_HOST=""
+DB_PORT=""
+DB_NAME=""
+DB_USER=""
+DB_PASSWORD=""
 
 
 # Check if input file is provided
