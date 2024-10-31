@@ -4,8 +4,8 @@
 OUTPUT_FILE="execution_times.txt"
 
 # Database connection parameters
-MASTER_PORT="9700"
-DB_NAME="Citus_M"
+MASTER_PORT=$DB_PORT
+DB_NAME=$DB_NAME
 
 # SQL file paths
 SQL_FILES=(
