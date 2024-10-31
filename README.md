@@ -19,5 +19,6 @@ The project aims to implement the TPC-DS benchmark on Citus Database (a Postgres
   - you can use your preferred destination directory (option -dir), and make sure it exists before executing the command.
   - here we are generating 1GB data, same command will be used to generate bigger scales.
 
-4. Create the tables according to TPC-Ds schema, set the distribution and reference tables, and load the data, using the script in /tpcds-official-kit-citus/tpcdskit-official-mac/Scripts/schema_and_load.sh
+4. Create the tables according to TPC-Ds schema, set the distribution and reference tables, and load the data, using the script schema_and_load.sh in [this directory](/tpcds-official-kit-citus/tpcdskit-official-mac/Scripts)
+
 
