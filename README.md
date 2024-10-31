@@ -43,6 +43,9 @@ In order to replicate our steps, the following should be done:
 
 - Steps 3 to 5 can be repeated for different scales.
 
+
+- Runtime of all queries are reported [here](tpcdskit-official-mac/Results/Queries_runtime.csv) for all scales. The csv file includes the 99 original queries followed by the 6 optimized ones for each of the 4 scales. 
+
    
 
 
